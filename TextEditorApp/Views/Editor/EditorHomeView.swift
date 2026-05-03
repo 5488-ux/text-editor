@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct EditorHomeView: View {
 	@EnvironmentObject private var store: DocumentStore
+	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
 	@State private var isImporterPresented = false
 	@State private var isNewPresented = false
@@ -91,9 +92,18 @@ struct EditorHomeView: View {
 	}
 
 	private var content: some View {
-		HStack(spacing: 12) {
-			documentList
-			editorPanel
+		if horizontalSizeClass == .compact {
+			VStack(spacing: 12) {
+				documentList
+					.frame(maxHeight: 320)
+				editorPanel
+			}
+		} else {
+			HStack(spacing: 12) {
+				documentList
+					.frame(minWidth: 320, maxWidth: 420)
+				editorPanel
+			}
 		}
 	}
 
@@ -152,7 +162,6 @@ struct EditorHomeView: View {
 				}
 			}
 		}
-		.frame(minWidth: 320)
 	}
 
 	private var editorPanel: some View {
