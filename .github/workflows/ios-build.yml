@@ -37,12 +37,27 @@ jobs:
 
       - name: Build for simulator
         run: |
+          set -o pipefail
+          LOG_PATH="$RUNNER_TEMP/xcodebuild-sim.log"
+          RESULT_BUNDLE_PATH="$RUNNER_TEMP/TextEditor-sim.xcresult"
+
           xcodebuild \
             -project TextEditor.xcodeproj \
             -scheme TextEditor \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
-            build
+            -resultBundlePath "$RESULT_BUNDLE_PATH" \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+            build | tee "$LOG_PATH"
+
+      - name: Upload simulator build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: text-editor-sim-build-logs
+          path: |
+            ${{ runner.temp }}/xcodebuild-sim.log
+            ${{ runner.temp }}/TextEditor-sim.xcresult
 
       - name: Prepare signing assets
         if: ${{ env.IOS_CERT_PEM_BASE64 != '' && env.IOS_KEY_PEM_BASE64 != '' && env.IOS_MOBILEPROVISION_BASE64 != '' && env.IOS_TEAM_ID != '' && env.IOS_BUNDLE_ID != '' && env.IOS_PROFILE_NAME != '' }}
