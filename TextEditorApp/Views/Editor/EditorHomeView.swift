@@ -6,6 +6,7 @@ struct EditorHomeView: View {
 
 	@State private var isImporterPresented = false
 	@State private var isNewPresented = false
+	@State private var isExporterPresented = false
 	@State private var exportItem: ExportItem?
 	@State private var alert: SimpleAlert?
 
@@ -53,13 +54,18 @@ struct EditorHomeView: View {
 			.presentationDetents([.medium, .large])
 		}
 		.fileExporter(
-			item: $exportItem,
+			isPresented: $isExporterPresented,
+			document: exportItem,
 			contentType: .data,
 			defaultFilename: exportItem?.defaultFilename ?? "export.txt"
 		) { result in
-			if case .failure(let error) = result {
+			switch result {
+			case .success:
+				break
+			case .failure(let error):
 				alert = SimpleAlert(title: "导出失败", message: error.localizedDescription)
 			}
+			exportItem = nil
 		}
 		.alert(item: $alert) { alert in
 			Alert(title: Text(alert.title), message: Text(alert.message), dismissButton: .default(Text("好")))
@@ -120,6 +126,7 @@ struct EditorHomeView: View {
 									do {
 										let url = try store.exportURL(for: doc.id)
 										exportItem = ExportItem(url: url, defaultFilename: doc.originalDisplayName)
+										isExporterPresented = true
 									} catch {
 										alert = SimpleAlert(title: "导出失败", message: error.localizedDescription)
 									}
@@ -157,6 +164,7 @@ struct EditorHomeView: View {
 					do {
 						let url = try store.exportURL(for: doc.id)
 						exportItem = ExportItem(url: url, defaultFilename: doc.originalDisplayName)
+						isExporterPresented = true
 					} catch {
 						alert = SimpleAlert(title: "导出失败", message: error.localizedDescription)
 					}
@@ -197,4 +205,3 @@ struct ExportItem: FileDocument, Identifiable {
 		return FileWrapper(regularFileWithContents: data)
 	}
 }
-
