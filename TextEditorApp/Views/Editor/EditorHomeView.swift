@@ -197,7 +197,7 @@ struct ExportItem: FileDocument, Identifiable {
 	}
 
 	init(configuration: ReadConfiguration) throws {
-		throw CocoaError(.fileReadUnsupported)
+		throw CocoaError(.fileReadUnknown)
 	}
 
 	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
