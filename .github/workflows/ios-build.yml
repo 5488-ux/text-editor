@@ -1,0 +1,40 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build (Simulator)
+        run: |
+          set -euo pipefail
+          DERIVED_DATA_PATH="${RUNNER_TEMP}/DerivedData"
+          xcodebuild \
+            -project TextEditor.xcodeproj \
+            -scheme TextEditor \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$DERIVED_DATA_PATH" \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Upload Simulator .app
+        uses: actions/upload-artifact@v4
+        with:
+          name: TextEditor-iphonesimulator-app
+          path: ${{ runner.temp }}/DerivedData/Build/Products/Release-iphonesimulator/TextEditor.app
