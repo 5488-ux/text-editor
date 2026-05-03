@@ -91,6 +91,7 @@ struct EditorHomeView: View {
 		}
 	}
 
+	@ViewBuilder
 	private var content: some View {
 		if horizontalSizeClass == .compact {
 			VStack(spacing: 12) {
