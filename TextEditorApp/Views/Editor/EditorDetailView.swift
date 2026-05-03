@@ -48,8 +48,24 @@ struct EditorDetailView: View {
 				.onChange(of: text) { _, newValue in
 					onChange(newValue)
 				}
+				.onChange(of: document.id) { _, _ in
+					text = document.lastKnownText
+				}
+
+			HStack(spacing: 12) {
+				Label("\(text.count) 字符", systemImage: "character.cursor.ibeam")
+				Spacer()
+				Label("\(lineCount) 行", systemImage: "text.alignleft")
+			}
+			.font(.caption)
+			.foregroundStyle(.secondary)
+			.padding(.horizontal, 4)
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+	}
+
+	private var lineCount: Int {
+		max(1, text.components(separatedBy: .newlines).count)
 	}
 
 	private var infoView: some View {
@@ -66,4 +82,3 @@ struct EditorDetailView: View {
 		.frame(width: 360)
 	}
 }
-

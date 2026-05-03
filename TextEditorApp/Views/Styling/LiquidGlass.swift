@@ -27,12 +27,27 @@ struct LiquidGlassCard<Content: View>: View {
 	var body: some View {
 		content
 			.padding(14)
-			.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+			.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 			.overlay(
-				RoundedRectangle(cornerRadius: 22, style: .continuous)
+				RoundedRectangle(cornerRadius: 18, style: .continuous)
 					.strokeBorder(.white.opacity(0.16), lineWidth: 1)
 			)
-			.shadow(color: .black.opacity(0.10), radius: 14, x: 0, y: 8)
+			.shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
+			.conditionalGlassEffect()
 	}
 }
 
+private extension View {
+	@ViewBuilder
+	func conditionalGlassEffect() -> some View {
+		#if compiler(>=6.2)
+		if #available(iOS 26, *) {
+			self.glassEffect()
+		} else {
+			self
+		}
+		#else
+		self
+		#endif
+	}
+}
